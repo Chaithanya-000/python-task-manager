@@ -1,0 +1,11 @@
+# Core Flask Framework & Database ORM
+Flask==3.0.3
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.35
+python-dotenv==1.0.1
+
+# Production WSGI Application Server (for Docker / Linux / EC2)
+gunicorn==22.0.0
+
+# Automated Testing Framework
+pytest==8.3.3

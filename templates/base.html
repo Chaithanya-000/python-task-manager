@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{% block title %}TaskMaster Pro - Task Management{% endblock %}</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5.3.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Custom SaaS Theme CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="dashboard-body">
+
+    <!-- Mobile Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-start bg-slate-900 text-white" tabindex="-1" id="mobileSidebar" aria-labelledby="mobileSidebarLabel">
+        <div class="offcanvas-header border-bottom border-slate-800">
+            <h5 class="offcanvas-title d-flex align-items-center gap-2" id="mobileSidebarLabel">
+                <i class="bi bi-kanban-fill text-primary-indigo fs-4"></i>
+                <span class="fw-bold tracking-tight">TaskMaster<span class="text-primary-indigo">Pro</span></span>
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body d-flex flex-column justify-content-between p-3">
+            <nav class="nav flex-column gap-1">
+                <a class="nav-link active rounded-3 px-3 py-2 text-white sidebar-link" href="#" data-filter="all" data-bs-dismiss="offcanvas">
+                    <i class="bi bi-grid-1x2-fill me-2 text-primary-indigo"></i> Dashboard
+                </a>
+                <a class="nav-link rounded-3 px-3 py-2 text-slate-400 sidebar-link" href="#" data-filter="all" data-bs-dismiss="offcanvas">
+                    <i class="bi bi-list-task me-2"></i> All Tasks
+                </a>
+                <a class="nav-link rounded-3 px-3 py-2 text-slate-400 sidebar-link" href="#" data-filter="Pending" data-bs-dismiss="offcanvas">
+                    <i class="bi bi-clock-history me-2 text-warning"></i> Pending Tasks
+                </a>
+                <a class="nav-link rounded-3 px-3 py-2 text-slate-400 sidebar-link" href="#" data-filter="Completed" data-bs-dismiss="offcanvas">
+                    <i class="bi bi-check2-circle me-2 text-success"></i> Completed Tasks
+                </a>
+            </nav>
+            <div class="pt-3 border-top border-slate-800">
+                <div class="d-flex align-items-center justify-content-between text-slate-400 small">
+                    <span><i class="bi bi-shield-check text-emerald me-1"></i> System Active</span>
+                    <a href="/health" target="_blank" class="badge bg-emerald-subtle text-emerald border border-emerald-subtle text-decoration-none">Health Check</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Wrapper with Desktop Sidebar & Content -->
+    <div class="d-flex" id="wrapper">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar bg-slate-900 text-white d-none d-lg-flex flex-column flex-shrink-0 p-3" style="width: 270px; min-height: 100vh;">
+            <div class="d-flex align-items-center gap-2 mb-4 px-2 py-1">
+                <div class="brand-icon-box bg-primary-subtle text-primary-indigo rounded-3 p-2">
+                    <i class="bi bi-kanban-fill fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="m-0 fw-bold tracking-tight">TaskMaster<span class="text-primary-indigo">Pro</span></h5>
+                    <span class="text-slate-400" style="font-size: 0.72rem;">Task Management</span>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <div class="mb-auto">
+                <div class="text-uppercase text-slate-500 fw-semibold px-2 mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">Overview</div>
+                <nav class="nav flex-column gap-1 mb-4">
+                    <a class="nav-link active rounded-3 px-3 py-2 text-white sidebar-link" href="#" data-filter="all">
+                        <i class="bi bi-grid-1x2-fill me-2 text-primary-indigo"></i> Dashboard
+                    </a>
+                    <a class="nav-link rounded-3 px-3 py-2 text-slate-400 sidebar-link" href="#" data-filter="all">
+                        <i class="bi bi-list-task me-2"></i> All Tasks
+                    </a>
+                    <a class="nav-link rounded-3 px-3 py-2 text-slate-400 sidebar-link" href="#" data-filter="Pending">
+                        <i class="bi bi-clock-history me-2 text-warning"></i> Pending Tasks
+                    </a>
+                    <a class="nav-link rounded-3 px-3 py-2 text-slate-400 sidebar-link" href="#" data-filter="Completed">
+                        <i class="bi bi-check2-circle me-2 text-success"></i> Completed Tasks
+                    </a>
+                </nav>
+
+                <div class="text-uppercase text-slate-500 fw-semibold px-2 mb-2" style="font-size: 0.72rem; letter-spacing: 0.05em;">Priority Views</div>
+                <nav class="nav flex-column gap-1">
+                    <a class="nav-link rounded-3 px-3 py-2 text-slate-400 sidebar-link" href="#" data-priority="High">
+                        <span class="dot-indicator bg-danger me-2"></span> High Priority
+                    </a>
+                    <a class="nav-link rounded-3 px-3 py-2 text-slate-400 sidebar-link" href="#" data-priority="Medium">
+                        <span class="dot-indicator bg-warning me-2"></span> Medium Priority
+                    </a>
+                    <a class="nav-link rounded-3 px-3 py-2 text-slate-400 sidebar-link" href="#" data-priority="Low">
+                        <span class="dot-indicator bg-info me-2"></span> Low Priority
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Sidebar Footer -->
+            <div class="pt-3 border-top border-slate-800">
+                <div class="p-2 bg-slate-800 rounded-3 mb-3">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <span class="small fw-semibold text-slate-300">System Status</span>
+                        <span class="badge bg-emerald-subtle text-emerald border border-emerald-subtle" id="sidebarHealthBadge">Online</span>
+                    </div>
+                    <div class="small text-slate-400 text-truncate" style="font-size: 0.75rem;">All services operational</div>
+                </div>
+
+                <div class="d-flex align-items-center justify-content-between px-1">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="user-avatar bg-indigo-600 text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                            <i class="bi bi-person-fill"></i>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <span class="small fw-semibold text-white">Administrator</span>
+                            <span class="text-slate-500" style="font-size: 0.7rem;">Active</span>
+                        </div>
+                    </div>
+                    <a href="/health" target="_blank" class="btn btn-sm btn-outline-slate text-slate-400 p-1" title="View /health endpoint">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="flex-grow-1 min-vh-100 bg-slate-50 d-flex flex-column">
+            <!-- Top Navigation Bar -->
+            <header class="navbar navbar-expand bg-white border-bottom border-slate-200 px-4 py-2 sticky-top shadow-xs">
+                <div class="container-fluid p-0">
+                    <!-- Mobile Hamburger -->
+                    <button class="btn btn-outline-secondary d-lg-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileSidebar" aria-controls="mobileSidebar">
+                        <i class="bi bi-list fs-5"></i>
+                    </button>
+
+                    <!-- Top Bar Title -->
+                    <div class="d-none d-md-flex align-items-center gap-2">
+                        <h6 class="m-0 fw-bold text-slate-800">Workspace Dashboard</h6>
+                    </div>
+
+                    <!-- Right Controls -->
+                    <div class="d-flex align-items-center gap-2 ms-auto">
+                        <!-- Quick Search in Header -->
+                        <div class="input-group input-group-sm header-search-box d-none d-sm-flex" style="width: 240px;">
+                            <span class="input-group-text bg-white border-end-0 text-slate-400"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" id="headerSearchInput" placeholder="Quick search tasks..." autocomplete="off">
+                        </div>
+
+                        <!-- Add Task Primary Button -->
+                        <button type="button" class="btn btn-primary-indigo btn-sm d-flex align-items-center gap-1 shadow-sm px-3" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+                            <i class="bi bi-plus-lg fw-bold"></i>
+                            <span class="d-none d-sm-inline">New Task</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Body Content -->
+            <div class="container-fluid px-4 py-4 flex-grow-1">
+                {% block content %}{% endblock %}
+            </div>
+
+            <!-- Dashboard Footer -->
+            <footer class="bg-white border-top border-slate-200 py-3 px-4 mt-auto">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-2 small text-slate-500">
+                    <div>
+                        <span>&copy; 2026 TaskMaster Pro. All rights reserved.</span>
+                    </div>
+                    <div>
+                        <span>Workspace Management System</span>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
+        <div id="liveToast" class="toast align-items-center border-0 shadow-lg text-white" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2" id="toastMessage">
+                    <i class="bi bi-info-circle-fill fs-5" id="toastIcon"></i>
+                    <span id="toastText">Notification text</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5.3.3 Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <!-- Custom Application Script -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

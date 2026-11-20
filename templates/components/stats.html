@@ -1,0 +1,83 @@
+<!-- Dashboard Metrics Cards Component -->
+<div class="row g-3 mb-4">
+    <!-- Card 1: Total Tasks -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card border-0 shadow-sm rounded-3 h-100 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-uppercase text-slate-500 fw-semibold tracking-wide" style="font-size: 0.75rem;">Total Tasks</span>
+                    <h3 class="fw-bold text-slate-900 mt-1 mb-0" id="totalTasksCount">0</h3>
+                </div>
+                <div class="stat-icon-wrapper bg-indigo-50 text-primary-indigo rounded-3 p-3">
+                    <i class="bi bi-stack fs-4"></i>
+                </div>
+            </div>
+            <div class="mt-3 pt-2 border-top border-slate-100 d-flex align-items-center justify-content-between text-slate-500 small">
+                <span>All recorded items</span>
+                <span class="badge bg-slate-100 text-slate-700 font-monospace" id="statBadgeTotal">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Pending Tasks -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card border-0 shadow-sm rounded-3 h-100 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-uppercase text-slate-500 fw-semibold tracking-wide" style="font-size: 0.75rem;">Pending Tasks</span>
+                    <h3 class="fw-bold text-amber-600 mt-1 mb-0" id="pendingTasksCount">0</h3>
+                </div>
+                <div class="stat-icon-wrapper bg-amber-50 text-amber-500 rounded-3 p-3">
+                    <i class="bi bi-clock-history fs-4"></i>
+                </div>
+            </div>
+            <div class="mt-3 pt-2 border-top border-slate-100 d-flex align-items-center justify-content-between text-slate-500 small">
+                <span>Needs action</span>
+                <span class="badge bg-amber-50 text-amber-700 border border-amber-200" id="statBadgePending">0 Pending</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Completed Tasks -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card border-0 shadow-sm rounded-3 h-100 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-uppercase text-slate-500 fw-semibold tracking-wide" style="font-size: 0.75rem;">Completed Tasks</span>
+                    <h3 class="fw-bold text-emerald mt-1 mb-0" id="completedTasksCount">0</h3>
+                </div>
+                <div class="stat-icon-wrapper bg-emerald-50 text-emerald rounded-3 p-3">
+                    <i class="bi bi-check2-circle fs-4"></i>
+                </div>
+            </div>
+            <div class="mt-3 pt-2 border-top border-slate-100 d-flex align-items-center justify-content-between text-slate-500 small">
+                <span>Finished items</span>
+                <span class="badge bg-emerald-50 text-emerald border border-emerald-200" id="statBadgeCompleted">0 Done</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Completion Rate -->
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card stat-card border-0 shadow-sm rounded-3 h-100 p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="text-uppercase text-slate-500 fw-semibold tracking-wide" style="font-size: 0.75rem;">Completion Rate</span>
+                    <h3 class="fw-bold text-slate-900 mt-1 mb-0" id="completionRateText">0%</h3>
+                </div>
+                <div class="stat-icon-wrapper bg-sky-50 text-sky-600 rounded-3 p-3">
+                    <i class="bi bi-graph-up-arrow fs-4"></i>
+                </div>
+            </div>
+            <div class="mt-3 pt-2">
+                <div class="progress progress-thin rounded-pill bg-slate-100" style="height: 6px;">
+                    <div id="completionProgressBar" class="progress-bar bg-primary-indigo rounded-pill transition-all" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2 text-slate-500 small" style="font-size: 0.75rem;">
+                    <span>Goal: 100%</span>
+                    <span id="rateSummaryLabel">0 / 0 completed</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

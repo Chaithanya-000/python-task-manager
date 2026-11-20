@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | TaskMaster Pro{% endblock %}
+
+{% block content %}
+<!-- Metric Cards -->
+{% include "components/stats.html" %}
+
+<!-- Main Task Management Card -->
+<div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+    <!-- Header Controls & Filters Bar -->
+    <div class="card-header bg-white border-bottom border-slate-100 p-3 p-md-4">
+        <div class="row g-3 align-items-center justify-content-between">
+            <!-- Left: Search Box -->
+            <div class="col-12 col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text bg-slate-50 border-end-0 text-slate-400">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control bg-slate-50 border-start-0 ps-0" id="taskSearchInput" placeholder="Search tasks by title or details..." autocomplete="off">
+                    <button class="btn btn-slate-50 border-start-0 border text-slate-400 d-none" type="button" id="clearSearchBtn">
+                        <i class="bi bi-x-circle"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Middle: Status Filter Pills -->
+            <div class="col-12 col-md-4 d-flex justify-content-md-center">
+                <div class="btn-group p-1 bg-slate-100 rounded-pill w-100 w-md-auto" role="group" aria-label="Status filters">
+                    <button type="button" class="btn btn-sm rounded-pill active px-3 filter-status-btn" data-status="All">All</button>
+                    <button type="button" class="btn btn-sm rounded-pill px-3 filter-status-btn" data-status="Pending">Pending</button>
+                    <button type="button" class="btn btn-sm rounded-pill px-3 filter-status-btn" data-status="Completed">Completed</button>
+                </div>
+            </div>
+
+            <!-- Right: Priority Filter, View Mode & Action -->
+            <div class="col-12 col-md-4 d-flex align-items-center justify-content-md-end gap-2">
+                <!-- Priority Selector Dropdown -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-slate btn-sm dropdown-toggle d-flex align-items-center gap-1 rounded-3" type="button" id="priorityFilterBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-filter"></i>
+                        <span id="currentPriorityLabel">All Priorities</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-slate-200" aria-labelledby="priorityFilterBtn">
+                        <li><a class="dropdown-item filter-priority-opt active" href="#" data-priority="All">All Priorities</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item filter-priority-opt text-danger" href="#" data-priority="High"><span class="dot-indicator bg-danger me-2"></span>High Priority</a></li>
+                        <li><a class="dropdown-item filter-priority-opt text-warning" href="#" data-priority="Medium"><span class="dot-indicator bg-warning me-2"></span>Medium Priority</a></li>
+                        <li><a class="dropdown-item filter-priority-opt text-primary" href="#" data-priority="Low"><span class="dot-indicator bg-info me-2"></span>Low Priority</a></li>
+                    </ul>
+                </div>
+
+                <!-- View Toggle (Table / Grid) -->
+                <div class="btn-group btn-group-sm" role="group" aria-label="View Toggle">
+                    <button type="button" class="btn btn-outline-slate active" id="tableViewBtn" title="Table View">
+                        <i class="bi bi-list-ul"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-slate" id="gridViewBtn" title="Card Grid View">
+                        <i class="bi bi-grid"></i>
+                    </button>
+                </div>
+
+                <!-- Refresh Button -->
+                <button type="button" class="btn btn-outline-slate btn-sm rounded-3" id="refreshTasksBtn" title="Refresh Tasks">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Filter Chips / Status Sub-bar -->
+    <div class="px-4 py-2 bg-slate-50 border-bottom border-slate-100 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2 small text-slate-500">
+            <span>Showing <strong class="text-slate-800" id="filteredTasksCount">0</strong> tasks</span>
+            <span id="activeFiltersContainer" class="d-flex align-items-center gap-1"></span>
+        </div>
+        <div class="small text-slate-400 d-none d-sm-block">
+            <i class="bi bi-shield-check text-emerald me-1"></i> Changes auto-saved
+        </div>
+    </div>
+
+    <!-- Task List Content: Table View -->
+    <div id="tableViewContainer" class="table-responsive">
+        <table class="table table-hover align-middle mb-0 custom-task-table">
+            <thead class="table-light text-slate-500 uppercase fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                <tr>
+                    <th scope="col" style="width: 50px;" class="text-center">Done</th>
+                    <th scope="col" style="width: 70px;">ID</th>
+                    <th scope="col">Task Details</th>
+                    <th scope="col" style="width: 130px;">Priority</th>
+                    <th scope="col" style="width: 140px;">Status</th>
+                    <th scope="col" style="width: 160px;">Created Date</th>
+                    <th scope="col" style="width: 140px;" class="text-end pe-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="taskTableBody">
+                <!-- Injected via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Task List Content: Grid / Cards View -->
+    <div id="gridViewContainer" class="p-4 d-none">
+        <div class="row g-3" id="taskCardsRow">
+            <!-- Injected via JavaScript -->
+        </div>
+    </div>
+
+    <!-- Empty State Container -->
+    <div id="emptyStateContainer" class="text-center py-5 px-3 d-none">
+        <div class="empty-state-icon mx-auto mb-3 bg-slate-100 rounded-circle d-flex align-items-center justify-content-center text-slate-400" style="width: 72px; height: 72px;">
+            <i class="bi bi-inbox fs-2"></i>
+        </div>
+        <h5 class="fw-bold text-slate-800 mb-1">No tasks found</h5>
+        <p class="text-slate-500 small mb-4" id="emptyStateMessage">You haven't added any tasks yet, or no tasks match your filter criteria.</p>
+        <button type="button" class="btn btn-primary-indigo btn-sm px-4 py-2 rounded-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#addTaskModal">
+            <i class="bi bi-plus-lg me-1"></i> Create First Task
+        </button>
+    </div>
+
+    <!-- Loading State Container -->
+    <div id="loadingStateContainer" class="text-center py-5">
+        <div class="spinner-border text-primary-indigo" role="status" style="width: 2.5rem; height: 2.5rem;">
+            <span class="visually-hidden">Loading tasks...</span>
+        </div>
+        <p class="text-slate-500 small mt-3">Fetching task data from server...</p>
+    </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- MODALS -->
+<!-- ========================================================= -->
+
+<!-- 1. Add Task Modal -->
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom border-slate-100 p-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="modal-icon-badge bg-primary-subtle text-primary-indigo rounded-3 p-2">
+                        <i class="bi bi-plus-circle-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-slate-900" id="addTaskModalLabel">Create New Task</h5>
+                        <p class="text-slate-500 small mb-0">Add a work item to track in your workflow</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="addTaskForm" novalidate>
+                <div class="modal-body p-4">
+                    <!-- Task Title -->
+                    <div class="mb-3">
+                        <label for="taskTitleInput" class="form-label fw-semibold text-slate-700 small">
+                            Task Title <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control rounded-3" id="taskTitleInput" placeholder="e.g. Prepare quarterly documentation" maxlength="150" required>
+                        <div class="invalid-feedback">Please provide a valid task title.</div>
+                    </div>
+
+                    <!-- Task Description -->
+                    <div class="mb-3">
+                        <label for="taskDescInput" class="form-label fw-semibold text-slate-700 small">
+                            Description <span class="text-slate-400 fw-normal">(Optional)</span>
+                        </label>
+                        <textarea class="form-control rounded-3" id="taskDescInput" rows="3" placeholder="Provide extra context, acceptance criteria or links..."></textarea>
+                    </div>
+
+                    <!-- Priority & Status Row -->
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label for="taskPrioritySelect" class="form-label fw-semibold text-slate-700 small">Priority</label>
+                            <select class="form-select rounded-3" id="taskPrioritySelect">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="taskStatusSelect" class="form-label fw-semibold text-slate-700 small">Initial Status</label>
+                            <select class="form-select rounded-3" id="taskStatusSelect">
+                                <option value="Pending" selected>Pending</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-slate-100 p-3 bg-slate-50 rounded-bottom-4">
+                    <button type="button" class="btn btn-outline-slate rounded-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary-indigo rounded-3 px-4" id="saveTaskBtn">
+                        <i class="bi bi-check-lg me-1"></i> Save Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 2. Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom border-slate-100 p-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="modal-icon-badge bg-amber-subtle text-amber-700 rounded-3 p-2">
+                        <i class="bi bi-pencil-square fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-slate-900" id="editTaskModalLabel">Edit Task #<span id="editTaskIdLabel"></span></h5>
+                        <p class="text-slate-500 small mb-0">Update task details and workflow properties</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editTaskForm" novalidate>
+                <input type="hidden" id="editTaskId">
+                <div class="modal-body p-4">
+                    <!-- Edit Task Title -->
+                    <div class="mb-3">
+                        <label for="editTaskTitle" class="form-label fw-semibold text-slate-700 small">
+                            Task Title <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" class="form-control rounded-3" id="editTaskTitle" maxlength="150" required>
+                        <div class="invalid-feedback">Task title cannot be empty.</div>
+                    </div>
+
+                    <!-- Edit Description -->
+                    <div class="mb-3">
+                        <label for="editTaskDesc" class="form-label fw-semibold text-slate-700 small">Description</label>
+                        <textarea class="form-control rounded-3" id="editTaskDesc" rows="3"></textarea>
+                    </div>
+
+                    <!-- Priority & Status Row -->
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label for="editTaskPriority" class="form-label fw-semibold text-slate-700 small">Priority</label>
+                            <select class="form-select rounded-3" id="editTaskPriority">
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label for="editTaskStatus" class="form-label fw-semibold text-slate-700 small">Status</label>
+                            <select class="form-select rounded-3" id="editTaskStatus">
+                                <option value="Pending">Pending</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-slate-100 p-3 bg-slate-50 rounded-bottom-4">
+                    <button type="button" class="btn btn-outline-slate rounded-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary-indigo rounded-3 px-4" id="updateTaskBtn">
+                        <i class="bi bi-save me-1"></i> Update Task
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 3. Delete Confirmation Modal -->
+<div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow-lg rounded-4 text-center p-4">
+            <div class="modal-body p-0">
+                <div class="mx-auto mb-3 bg-danger-subtle text-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 54px; height: 54px;">
+                    <i class="bi bi-trash3-fill fs-4"></i>
+                </div>
+                <h5 class="fw-bold text-slate-900 mb-2">Delete Task?</h5>
+                <p class="text-slate-500 small mb-4">
+                    Are you sure you want to delete <strong class="text-slate-800" id="deleteTaskTitleSpan"></strong>? This action cannot be undone.
+                </p>
+                <input type="hidden" id="deleteTaskId">
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-slate flex-fill rounded-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger flex-fill rounded-3" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. View Task Details Modal -->
+<div class="modal fade" id="viewTaskModal" tabindex="-1" aria-labelledby="viewTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom border-slate-100 p-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="modal-icon-badge bg-primary-subtle text-primary-indigo rounded-3 p-2">
+                        <i class="bi bi-file-text-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-slate-900" id="viewTaskTitle">Task Details</h5>
+                        <p class="text-slate-500 small mb-0">Task ID: #<span id="viewTaskId"></span></p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <span id="viewTaskPriorityBadge"></span>
+                    <span id="viewTaskStatusBadge"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="text-uppercase text-slate-400 fw-bold small" style="font-size: 0.72rem;">Description</label>
+                    <p class="text-slate-700 bg-slate-50 p-3 rounded-3 mt-1 text-break" id="viewTaskDesc" style="white-space: pre-wrap;">No description provided.</p>
+                </div>
+                <div class="row g-2 text-slate-500 small border-top border-slate-100 pt-3">
+                    <div class="col-6">
+                        <span class="text-slate-400 d-block" style="font-size: 0.72rem;">CREATED</span>
+                        <span id="viewTaskCreated" class="fw-semibold text-slate-700"></span>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-slate-400 d-block" style="font-size: 0.72rem;">LAST UPDATED</span>
+                        <span id="viewTaskUpdated" class="fw-semibold text-slate-700"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-top border-slate-100 p-3 bg-slate-50 rounded-bottom-4">
+                <button type="button" class="btn btn-outline-slate rounded-3" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary-indigo rounded-3" id="viewEditShortcutBtn">
+                    <i class="bi bi-pencil-square me-1"></i> Edit Task
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
